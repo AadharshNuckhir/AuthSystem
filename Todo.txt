@@ -1,0 +1,128 @@
+Login page
+Register page
+
+Author Page (2 drop-downs -> to search for an author, and the second to search by genre) Enabled for Agent and Publisher
+
+Agent Page (2 drop-downs -> to search for an agent, and the second to search by genre) Enabled for Author and Publisher
+
+Publisher Page (2 drop-downs -> to search for a publisher, and the second to search by genre) Enabled for Author and Agent
+
+A payment page where publishers can pay the authors directly. (Enabled for Publishers only)
+
+An auction page where several publishers can bid on a book. (Enabled for Publisher only)
+
+A live chat page where an author can communicate with agents and publishers. (Enabled for Author only)
+
+A page with a text editor that resembles google doc where the author will write their book and save it. As well as give viewing and editing access to other people. (Enabled for Author only)
+
+
+// 09/08/2023
+Create tabs in the home page
+
+Fetch data and make it appear in home page
+
+
+"DefaultConnection": "Server=DISHA\\SQLEXPRESS;Database=AuthSystem;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true"
+
+dotnet ef migrations add InitialMigration -c ApplicationDbContext
+dotnet ef database update -c ApplicationDbContext
+
+
+// Check for user type
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    var user = await UserManager.GetUserAsync(User); // Get the current user
+    var isAdmin = await UserManager.IsInRoleAsync(user, "Admin"); // Check if user is in "Admin" role
+}
+
+<nav class="navbar">
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/about">About</a>
+        </li>
+
+        @if (isAdmin)
+        {
+            <li class="nav-item">
+                <a class="nav-link" href="/admin">Admin Panel</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
+// Identity Role
+
+services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+    services.AddIdentity<User, IdentityRole>()
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
+		
+		
+		//// Seed initial data
+        //if (!Authors.Any())
+        //{
+        //    var author1 = new Author { UserId = "authorUserId1", Bio = "Bio 1", WebsiteUrl = "https://author1.com" };
+        //    var author2 = new Author { UserId = "authorUserId2", Bio = "Bio 2", WebsiteUrl = "https://author2.com" };
+        //    Authors.AddRange(author1, author2);
+        //}
+
+        //if (!Agents.Any())
+        //{
+        //    var agent1 = new Agent { UserId = "agentUserId1", AgencyName = "Agency 1", ContactEmail = "agent1@example.com" };
+        //    var agent2 = new Agent { UserId = "agentUserId2", AgencyName = "Agency 2", ContactEmail = "agent2@example.com" };
+        //    Agents.AddRange(agent1, agent2);
+        //}
+
+        //if (!Publishers.Any())
+        //{
+        //    var publisher1 = new Publisher { UserId = "publisherUserId1", CompanyName = "Publisher 1", ContactEmail = "publisher1@example.com" };
+        //    var publisher2 = new Publisher { UserId = "publisherUserId2", CompanyName = "Publisher 2", ContactEmail = "publisher2@example.com" };
+        //    Publishers.AddRange(publisher1, publisher2);
+        //}
+
+        //if (!Genres.Any())
+        //{
+        //    var genre1 = new Genre { Name = "Fantasy" };
+        //    var genre2 = new Genre { Name = "Science Fiction" };
+        //    Genres.AddRange(genre1, genre2);
+        //}
+
+        //if (!Books.Any())
+        //{
+        //    var book1 = new Book { Title = "Book 1", AuthorId = 1, GenreId = 1 };
+        //    var book2 = new Book { Title = "Book 2", AuthorId = 2, GenreId = 2 };
+        //    Books.AddRange(book1, book2);
+        //}
+
+        //if (!AuthorGenres.Any())
+        //{
+        //    var authorGenre1 = new AuthorGenre { AuthorId = 1, GenreId = 1 };
+        //    var authorGenre2 = new AuthorGenre { AuthorId = 2, GenreId = 2 };
+        //    AuthorGenres.AddRange(authorGenre1, authorGenre2);
+        //}
+
+        //if (!AgentGenres.Any())
+        //{
+        //    var agentGenre1 = new AgentGenre { AgentId = 1, GenreId = 1 };
+        //    var agentGenre2 = new AgentGenre { AgentId = 2, GenreId = 2 };
+        //    AgentGenres.AddRange(agentGenre1, agentGenre2);
+        //}
+
+        //if (!PublisherGenres.Any())
+        //{
+        //    var publisherGenre1 = new PublisherGenre { PublisherId = 1, GenreId = 1 };
+        //    var publisherGenre2 = new PublisherGenre { PublisherId = 2, GenreId = 2 };
+        //    PublisherGenres.AddRange(publisherGenre1, publisherGenre2);
+        //}
+
+        //SaveChanges();
+
