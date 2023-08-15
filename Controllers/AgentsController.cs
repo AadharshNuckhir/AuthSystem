@@ -20,9 +20,13 @@ namespace AuthSystem.Controllers
         }
 
         // GET: Agents
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? selectedGenreId)
         {
-            var autSystemContext = _context.Agents;
+            var autSystemContext = _context.Agents.Include(a=>a.InterestedGenres);
+
+            if (selectedGenreId.HasValue)
+                //autSystemContext = autSystemContext.Where(a => a.InterestedGenres.Any(g=> g.Id == selectedGenreId.Value)).ToList();
+
             return View(await autSystemContext.ToListAsync());
         }
 
@@ -136,6 +140,13 @@ namespace AuthSystem.Controllers
         private bool AgentExists(int id)
         {
           return (_context.Agents?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        public async Task OnGetAsync(string searchString)
+        {
+            var autSystemContext = _context.Agents;
+            
+            // Apply Filter
         }
     }
 }
