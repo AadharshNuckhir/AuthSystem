@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AuthSystem.Areas.Identity.Data.Author>
+﻿@model AuthSystem.ViewModels.AuthorGenreViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -13,6 +13,17 @@
             <a asp-controller="Authors" asp-action="Create" class="btn btn-primary">Create New Author</a>
         </div>
     </div>
+    <br />
+    <br />
+
+    <form asp-action="Index" method="get">
+        <div class="form-group">
+            <label for="GenreName">Search by Genre:</label>
+            <input type="text" class="form-control" id="GenreName" name="GenreName" value="@Model.GenreSearch" />
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
     <br />
     <br />
 
@@ -34,7 +45,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var obj in Model)
+            @foreach (var obj in Model.Authors)
             {
                 <tr>
                     <td width="15%">

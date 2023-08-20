@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AuthSystem.Areas.Identity.Data.Agent>
+﻿@model AuthSystem.ViewModels.AgentGenreViewModel
 @{
     ViewData["Title"] = "Index";
 }
@@ -17,13 +17,14 @@
 
     <form asp-action="Index" method="get">
         <div class="form-group">
-            <label for="GenreId">Filter by Genre:</label>
-            @*<select asp-for="SelectedGenreId" asp-items="@Model.GenreSelectList" class="form-control">
-                <option value="">All Genres</option>
-            </select>*@
-            <button type="submit" class="btn btn-primary">Apply Filter</button>
+            <label for="GenreName">Search by Genre:</label>
+            <input type="text" class="form-control" id="GenreName" name="GenreName" value="@Model.GenreSearch" />
         </div>
+        <br />
+        <button type="submit" class="btn btn-primary">Search</button>
     </form>
+    <br />
+    <br />
 
     <table class="table table-bordered table-striped" style="width:100%">
         <thead>
@@ -43,7 +44,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var obj in Model)
+            @foreach (var obj in Model.Agents)
             {
                 <tr>
                     <td width="15%">

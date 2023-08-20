@@ -7,9 +7,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AuthSystem.Areas.Identity.Data;
 using AuthSystem.Data;
+using Microsoft.AspNetCore.Authorization;
+using AuthSystem.ViewModels;
+using AuthSystem.Exceptions;
 
 namespace AuthSystem.Controllers
 {
+    [Authorize(Roles = "Admin,Author")]
     public class PublishersController : Controller
     {
         private readonly AutSystemContext _context;
@@ -20,10 +24,27 @@ namespace AuthSystem.Controllers
         }
 
         // GET: Publishers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string genreName)
         {
-            var autSystemContext = _context.Publishers;
-            return View(await autSystemContext.ToListAsync());
+            var viewModel = new PublisherGenreViewModel
+            {
+                Publishers = await _context.Publishers.ToListAsync(),
+                PublisherGenre = await _context.PublisherGenres.ToListAsync(),
+                Genre = await _context.Genres.ToListAsync(),
+                GenreSearch = genreName
+            };
+
+            if (!string.IsNullOrEmpty(genreName))
+            {
+                // Filter authors based on genre name
+                viewModel.Publishers = from publisher in viewModel.Publishers
+                                       join publisherGenre in viewModel.PublisherGenre on publisher.Id equals publisherGenre.PublisherId
+                                       join genre in viewModel.Genre on publisherGenre.GenreId equals genre.Id
+                                       where genre.Name == genreName
+                                       select publisher;
+            }
+
+            return View(viewModel);
         }
 
         // GET: Publishers/Details/5
@@ -45,6 +66,7 @@ namespace AuthSystem.Controllers
         }
 
         // GET: Publishers/Create
+        [AllowOnlyAdminRolesAttribute]
         public IActionResult Create()
         {
             return View();
@@ -54,6 +76,7 @@ namespace AuthSystem.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [AllowOnlyAdminRolesAttribute]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Email")] Publisher publisher)
         {
@@ -63,6 +86,7 @@ namespace AuthSystem.Controllers
         }
 
         // GET: Publishers/Edit/5
+        [AllowOnlyAdminRolesAttribute]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Publishers == null)
@@ -82,6 +106,7 @@ namespace AuthSystem.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [AllowOnlyAdminRolesAttribute]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,Email")] Publisher publisher)
         {
@@ -96,6 +121,7 @@ namespace AuthSystem.Controllers
         }
 
         // GET: Publishers/Delete/5
+        [AllowOnlyAdminRolesAttribute]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Publishers == null)
@@ -115,6 +141,7 @@ namespace AuthSystem.Controllers
 
         // POST: Publishers/Delete/5
         [HttpPost, ActionName("Delete")]
+        [AllowOnlyAdminRolesAttribute]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

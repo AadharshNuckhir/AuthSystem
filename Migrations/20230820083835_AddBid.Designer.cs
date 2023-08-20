@@ -4,6 +4,7 @@ using AuthSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AuthSystem.Migrations
 {
     [DbContext(typeof(AutSystemContext))]
-    partial class AutSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20230820083835_AddBid")]
+    partial class AddBid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,32 +205,6 @@ namespace AuthSystem.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("AuthSystem.Areas.Identity.Data.Bid", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("PublisherId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("PublisherId");
-
-                    b.ToTable("Bids");
                 });
 
             modelBuilder.Entity("AuthSystem.Areas.Identity.Data.Book", b =>
@@ -534,25 +510,6 @@ namespace AuthSystem.Migrations
                     b.Navigation("Agent");
 
                     b.Navigation("Author");
-
-                    b.Navigation("Publisher");
-                });
-
-            modelBuilder.Entity("AuthSystem.Areas.Identity.Data.Bid", b =>
-                {
-                    b.HasOne("AuthSystem.Areas.Identity.Data.Book", "Book")
-                        .WithMany()
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AuthSystem.Areas.Identity.Data.Publisher", "Publisher")
-                        .WithMany()
-                        .HasForeignKey("PublisherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Book");
 
                     b.Navigation("Publisher");
                 });

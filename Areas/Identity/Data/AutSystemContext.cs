@@ -16,6 +16,7 @@ public class AutSystemContext : IdentityDbContext<AuthSystemUser>
     public DbSet<AuthorGenre> AuthorGenres { get; set; }
     public DbSet<AgentGenre> AgentGenres { get; set; }
     public DbSet<PublisherGenre> PublisherGenres { get; set; }
+    public DbSet<Bid> Bids { get; set; }
 
     public AutSystemContext(DbContextOptions<AutSystemContext> options)
         : base(options)
@@ -80,5 +81,13 @@ public class AutSystemContext : IdentityDbContext<AuthSystemUser>
             .HasOne(pg => pg.Genre)
             .WithMany(g => g.InterestedPublishers)
             .HasForeignKey(pg => pg.GenreId);
+
+        modelBuilder.Entity<Book>()
+            .Property(b => b.Price)
+            .HasColumnType("decimal(18, 2)"); // Adjust the precision and scale as needed
+
+        modelBuilder.Entity<Bid>()
+            .Property(b => b.Price)
+            .HasColumnType("decimal(18, 2)"); // Adjust the precision and scale as needed
     }
 }

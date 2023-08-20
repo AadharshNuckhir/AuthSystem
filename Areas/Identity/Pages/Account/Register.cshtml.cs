@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using AuthSystem.Data;
 
 namespace AuthSystem.Areas.Identity.Pages.Account
 {
@@ -30,13 +31,15 @@ namespace AuthSystem.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<AuthSystemUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly AutSystemContext _context;
 
         public RegisterModel(
             UserManager<AuthSystemUser> userManager,
             IUserStore<AuthSystemUser> userStore,
             SignInManager<AuthSystemUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            AutSystemContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +47,7 @@ namespace AuthSystem.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         /// <summary>
@@ -71,6 +75,14 @@ namespace AuthSystem.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            [Required]
+            [Display(Name = "FirstName")]
+            public string FirstName { get; set; }
+
+            [Required]
+            [Display(Name = "LastName")]
+            public string LastName { get; set; }
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -98,6 +110,8 @@ namespace AuthSystem.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            public List<string> Roles { get; set; }
         }
 
 
@@ -117,10 +131,51 @@ namespace AuthSystem.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                user.FirstName = Input.FirstName;
+                user.LastName = Input.LastName;
+                
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
+                    foreach (var roleName in Input.Roles)
+                    {
+                        await _userManager.AddToRoleAsync(user, roleName);
+                    }
+
+                    if (Input.Roles[0] == "author") 
+                    {
+                        Author author = new Author();
+                        author.FirstName = Input.FirstName;
+                        author.LastName = Input.LastName;
+                        author.Email = Input.Email;
+                        author.AgentId = _context.Agents.FirstOrDefault().Id;
+
+                        await _context.Authors.AddAsync(author);
+                        await _context.SaveChangesAsync();
+                    }
+                    else if (Input.Roles[0] == "agent")
+                    {
+                        Agent agent = new Agent();
+                        agent.FirstName = Input.FirstName;
+                        agent.LastName = Input.LastName;
+                        agent.Email = Input.Email;
+                        agent.AgencyName = string.Format("{0} {1} Agency Ltd", Input.FirstName, Input.LastName);
+
+                        await _context.Agents.AddAsync(agent);
+                        await _context.SaveChangesAsync();
+                    }
+                    else if (Input.Roles[0] == "publisher")
+                    {
+                        Publisher publisher = new Publisher();
+                        publisher.FirstName = Input.FirstName;
+                        publisher.LastName = Input.LastName;
+                        publisher.Email = Input.Email;
+
+                        await _context.Publishers.AddAsync(publisher);
+                        await _context.SaveChangesAsync();
+                    }
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
